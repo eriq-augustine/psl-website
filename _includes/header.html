@@ -21,14 +21,8 @@
         <div class="trigger">
           {%- assign sorted_pages = site.pages | sort: "order" -%}
           {%- for page in sorted_pages -%}
-            {%- if page.nav-title or page.title -%}
-              {%- if page.nav-title -%}
-                {%- assign title = page.nav-title -%}
-              {%- else -%}
-                {%- assign title = page.title -%}
-              {%- endif -%}
-
-              <a class="page-link" href="{{ page.url | relative_url }}">{{ title | escape }}</a>
+            {%- if page.nav-title  -%}
+              <a class="page-link" href="{{ page.url | relative_url }}">{{ page.nav-title | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
         </div>

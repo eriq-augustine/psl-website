@@ -147,3 +147,37 @@ h2.footer-heading {
    display: inline-block;
    margin-left: 20px;
 }
+
+.version-lists {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: flex-start;
+}
+
+.version-list {
+   list-style: none;
+   margin-left: 0;
+}
+
+.version-list li:first-child {
+   font-size: $base-font-size * 1.50;
+}
+
+.version-list li:nth-child(n + 2) {
+   margin-left: 20px;
+}
+
+.version-list li::before {
+   padding-right: 10px;
+}
+
+.release-type-master .version-list li::before {
+   content: "\2605";
+   color: #5cb85c;
+}
+
+.release-type-develop .version-list li::before {
+   content: "\2699";
+   color: grey;
+}

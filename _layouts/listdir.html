@@ -1,0 +1,100 @@
+---
+layout: default
+---
+
+{{ content }}
+
+{% assign allFiles = site.static_files | concat: site.pages %}
+
+{% assign stableDirents = site.emptyArray %}
+{% assign devDirents = site.emptyArray %}
+
+{% for file in allFiles %}
+    {% assign path = file.path | prepend: '/' %}
+    {% assign path = path | replace: '//', '/' %}
+
+    {% assign dirParts = path | split: page.targetDir %}
+    {% assign partsSize = dirParts | size %}
+
+    {% if partsSize != 2 or dirParts[0] != '' %}
+        {% continue %}
+    {% endif %}
+
+    {% assign parts = dirParts[1] | split: '/' %}
+
+    {% comment %}
+        Prepare items for sorting.
+        Just sort by version number, but X.Y.Z comes after CANARY-X.Y.Z.
+        To get this last sorting, append 'Z' to the non-canary version.
+    {% endcomment %}
+
+    {% assign basename = parts[1] %}
+    {% assign direntPath = page.targetDir | append: '/' | append: basename %}
+
+    {% assign stable = false %}
+
+    {% assign sortKey = basename %}
+    {% if basename == 'master' %}
+        {% assign sortKey = '' %}
+        {% assign stable = true %}
+    {% elsif basename == 'develop' %}
+        {% assign sortKey = '' %}
+    {% elsif basename contains 'CANARY' %}
+        {% assign sortKey = sortKey | remove: 'CANARY-' %}
+    {% else %}
+        {% assign sortKey = sortKey | append: '-Z' %}
+        {% assign stable = true %}
+    {% endif %}
+
+    {% assign stringData = sortKey | append: ';' | append: direntPath | append: ';' | append: basename %}
+
+    {% if stableDirents contains stringData or devDirents contains stringData %}
+        {% continue %}
+    {% endif %}
+
+    {% if stable %}
+        {% assign stableDirents = stableDirents | push: stringData %}
+    {% else %}
+        {% assign devDirents = devDirents | push: stringData %}
+    {% endif %}
+{% endfor %}
+
+{% assign stableDirents = stableDirents | sort | reverse %}
+{% assign devDirents = devDirents | sort | reverse %}
+
+{% assign direntTypes = site.emptyArray %}
+{% assign direntTypes = direntTypes | push: stableDirents %}
+{% assign direntTypes = direntTypes | push: devDirents %}
+
+<div class='version-lists'>
+    {% for dirents in direntTypes %}
+        {% if dirents.size == 0 %}
+            {% continue %}
+        {% endif %}
+
+        {% assign releaseType = dirents.first | split: ';' | last %}
+
+        <div class='release-type release-type-{{ releaseType }}'>
+            <ul class='version-list'>
+                {% for dirent in dirents %}
+                    {% assign data = dirent | split: ';' %}
+
+                    {% assign sortKey = data[0] %}
+                    {% assign path = data[1] %}
+                    {% assign basename = data[2] %}
+
+                    {% assign displayName = basename %}
+                    {% if displayName == 'master' %}
+                        {% assign displayName = 'Current Stable Release' %}
+                    {% elsif displayName == 'develop' %}
+                        {% assign displayName = 'Current Development Release' %}
+                    {% endif %}
+
+                    <li class='dirent version-{{basename}}'>
+                        <a href="{{ path | relative_url }}">{{ displayName }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>

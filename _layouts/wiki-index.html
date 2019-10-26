@@ -1,0 +1,23 @@
+---
+layout: default
+---
+
+{% assign version = page.dir | split: '/' | shift | last %}
+
+<h1>PSL Code Wiki -- Version {{ version }}</h1>
+
+<ul class='wiki-pages'>
+    {% for wikiPage in site.pages %}
+        {% if page.dir != wikiPage.dir or wikiPage.layout == 'wiki-index' %}
+            {% continue %}
+        {% endif %}
+
+        {% assign name = wikiPage.name | replace: '.md', '' | replace: '-', ' ' %}
+
+        <li>
+            <a href='{{ wikiPage.url | relative_url }}'>{{ name }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{{ content }}

@@ -1,0 +1,9 @@
+---
+layout: default
+---
+
+{% assign gitURLPrefix = "https://github.com/linqs/psl-website/blob/develop/" %}
+
+{{ content }}
+
+<a class='edit-wiki-link' href="{{ gitURLPrefix | append: page.path }}">Edit This Page</a>
